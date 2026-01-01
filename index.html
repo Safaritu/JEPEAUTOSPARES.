@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JEPE AUTOSPARES | Secure Login</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #6366f1; 
+            --accent: #f59e0b; 
+            --bg-dark: #0f172a; 
+            --card-dark: #1e293b;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: radial-gradient(circle at top left, #1e1b4b, #0f172a); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .welcome-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .welcome-header .logo-icon {
+            background: var(--primary);
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.5);
+            color: white;
+        }
+
+        .welcome-header h1 { 
+            color: white; 
+            margin: 0; 
+            font-size: 1.7rem; 
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .welcome-header p { color: var(--text-dim); font-size: 0.9rem; margin-top: 8px; font-weight: 500; }
+
+        .auth-card { 
+            background: rgba(30, 41, 59, 0.7); 
+            padding: 40px; 
+            border-radius: 28px; 
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+        }
+
+        .status-pill {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 25px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        h2 { margin: 0 0 30px 0; font-size: 1.5rem; font-weight: 700; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--text-dim); text-transform: uppercase; }
+
+        input, select { 
+            width: 100%; 
+            padding: 15px; 
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 14px; 
+            box-sizing: border-box; 
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        input:focus { 
+            outline: none; 
+            border-color: var(--primary); 
+            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 16px; 
+            border: none; 
+            border-radius: 14px; 
+            font-weight: 800; 
+            font-size: 1rem;
+            cursor: pointer; 
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-main { background: var(--primary); color: white; }
+        .btn-main:hover { background: #4f46e5; transform: translateY(-2px); }
+
+        .toggle-link { text-align: center; font-size: 0.9rem; color: var(--text-dim); cursor: pointer; margin-top: 25px; }
+        .toggle-link b { color: var(--primary); }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .footer b { color: var(--accent); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="welcome-header">
+        <div class="logo-icon">J</div>
+        <h1>JEPE AUTOSPARES</h1>
+        <p>Premium Spares, Gas Hub & Banking</p>
+    </div>
+
+    <div class="auth-card">
+        <div class="status-pill" id="status-pill">AUTHENTICATION REQUIRED</div>
+        <h2 id="auth-title">Account Login</h2>
+        
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="staff@jepe.com">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        
+        <div id="register-fields" class="hidden">
+            <div class="input-group">
+                <label>Staff Role</label>
+                <select id="role">
+                    <option value="cashier">Cashier Access</option>
+                    <option value="admin">Administrator Access</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-main" id="main-btn" onclick="handleAuth()">Sign In</button>
+        
+        <div class="toggle-link" onclick="toggleMode()" id="toggle-text">
+            Need staff access? <b>Register here</b>
+        </div>
+    </div>
+
+    <div class="footer">
+        Designed & Developed by <b>Alex Safari</b><br>
+        Lead Engineer at <b>SAFTECH Solutions</b><br>
+        Contact: 0794963537 / 0707441702
+    </div>
+</div>
+
+<script type="module">
+    import { supabase } from './auth.js';
+
+    let isLogin = true;
+
+    window.toggleMode = () => {
+        isLogin = !isLogin;
+        document.getElementById('auth-title').innerText = isLogin ? "Account Login" : "Staff Registration";
+        document.getElementById('status-pill').innerText = isLogin ? "AUTHENTICATION REQUIRED" : "NEW STAFF SETUP";
+        document.getElementById('register-fields').classList.toggle('hidden');
+        document.getElementById('main-btn').innerText = isLogin ? "Sign In" : "Register Staff";
+        document.getElementById('toggle-text').innerHTML = isLogin ? 
+            "Need staff access? <b>Register here</b>" : 
+            "Already a member? <b>Sign In</b>";
+    };
+
+    window.handleAuth = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+        const btn = document.getElementById('main-btn');
+
+        if (!email || !password) return alert("Please fill in all fields");
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+            if (isLogin) {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                checkRoleAndRedirect(data.user.id);
+            } else {
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                
+                if (data.user) {
+                    const { error: profileError } = await supabase
+                        .from('profiles')
+                        .insert([{ id: data.user.id, email: email, role: role }]);
+
+                    if (profileError) throw new Error("Profile creation failed: " + profileError.message);
+
+                    alert("Registration successful! You can now log in.");
+                    toggleMode();
+                }
+            }
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = isLogin ? "Sign In" : "Register Staff";
+        }
+    };
+
+    async function checkRoleAndRedirect(userId) {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', userId)
+            .single();
+
+        if (error || !data) return alert("Profile not found. Please contact admin.");
+
+        window.location.href = (data.role === 'admin') ? 'admin.html' : 'cashier.html';
+    }
+</script>
+</body>
+</html>
