@@ -67,8 +67,18 @@
         th { text-align: left; padding: 18px 20px; background: #f8fafc; font-size: 0.7rem; text-transform: uppercase; color: var(--text-dim); }
         td { padding: 18px 20px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 
+        /* --- MOBILE LIST --- */
         .mobile-list { display: none; }
-        .transaction-card { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+        .transaction-card { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+        .mobile-desc { 
+            font-size: 0.8rem; 
+            color: var(--text-dim); 
+            background: #f1f5f9; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            margin-top: 4px;
+            font-style: italic;
+        }
 
         .type-pill { padding: 4px 10px; border-radius: 6px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
         .type-in { background: #dcfce7; color: #166534; }
@@ -176,6 +186,7 @@
             
             const date = new Date(t.created_at).toLocaleDateString();
             const time = new Date(t.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const description = t.description || 'No description provided';
 
             desktopHTML += `
                 <tr>
@@ -190,15 +201,18 @@
 
             mobileHTML += `
                 <div class="transaction-card">
-                    <div style="display:flex; justify-content:space-between;">
+                    <div style="display:flex; justify-content:space-between; align-items: center;">
                         <span class="type-pill ${isMoneyIn ? 'type-in' : 'type-out'}">${t.type}</span>
-                        <small style="color:var(--text-dim)">${date} ${time}</small>
+                        <small style="color:var(--text-dim); font-weight: 600;">${date} • ${time}</small>
                     </div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:5px;">
-                        <span style="font-weight:700;">${t.category || 'General'}</span>
-                        <span style="font-weight:800; color:${isMoneyIn ? 'var(--success)' : 'var(--danger)'}">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:700; font-size: 1rem;">${t.category || 'General'}</span>
+                        <span style="font-weight:800; font-size: 1.1rem; color:${isMoneyIn ? 'var(--success)' : 'var(--danger)'}">
                             ${isMoneyIn ? '+' : '-'} Ksh ${amount.toLocaleString()}
                         </span>
+                    </div>
+                    <div class="mobile-desc">
+                        📝 ${description}
                     </div>
                 </div>`;
         });
